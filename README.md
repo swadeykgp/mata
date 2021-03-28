@@ -1,6 +1,6 @@
 # mata 
-Multi Robot Task Assignment 
-
+Multi Robot Task Assignment                                 
+and Path Finding
 
 This is an assignment on multi agent task assignment in the  and to some extent path planning for a class assignment Artificial Intelligence: Foundations and Applications AI61005, SPRING, 2021 by Swarnava Dey and Seban James
 
