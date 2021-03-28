@@ -1,0 +1,26 @@
+agents:
+-   start: [0, 5]
+    pick: [0, 0]
+    drop: [12, 2]
+    goal: [8, 5]
+    name: SwaRo-1 
+-   start: [9, 0]
+    pick: [6, 1]
+    drop: [5, 5]
+    goal: [5, 0]
+    name: SwaRo-2
+-   start: [0, 5]
+    pick: [0, 0]
+    drop: [5, 5]
+    goal: [5, 0]
+    name: SwaRo-3
+
+map:
+    dimensions: [17, 6]
+    obstacles:
+    - !!python/tuple [13, 0]
+    - !!python/tuple [1, 2]
+    - !!python/tuple [15, 2]
+    - !!python/tuple [10, 4]
+    - !!python/tuple [3, 5]
+
