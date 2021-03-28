@@ -362,25 +362,8 @@ map:
 
 We will get these assignments from the previous step ( file  generation will be automated in next release)
 
-The output will 
+The output will look like this:
 
-It is the input file which we have to predefine the No.of Robots which are available to complete the all tasks.We have to predefine the Robot’s start and end locations and Task’s pickup and delivery locations.
-For any agent let’s say agent0, We have 4 tasks as following
-In this our format in INPUT1 file:
-goal: [7, 2]
-    	name: agent0
-    	start: [2, 5]
-It means agent0 starts from the start position and reaches to this goal position. Like this,we have the following four tasks as mentioned below.
-Task1: robot start position to pick-up location.
-Task2: pickup location to storage station.
-Task3: storage station to delivery location
-Task4:delivery location to final location of robot.
-
-In this file,we have other inputs which are obstacle cells where robots can not progress through that cell. 
-
-In our input file we just take two robots but we can take any number of robots we want. We can make our desired grid size and can make any number of obstacles.Care must be taken in assigning start location,end location,pickup location,end location as these can’t  be obstacle cells. This is our input file.
-
-In the output file, every agent starts from their starting position at time t=0 secs to do the Task1 as we mentioned in the input file. Output is in the format that at time t,x and y coordinates of a robot are printed as below. After completion of Task1 by all robots, Task2 will be initiated at time t=x where x is a time taken by the corresponding agent to complete its previous task i.e, Task1 here. Like this, by completion of all tasks by all robots, we will get time taken by a robot to complete all of its tasks.
 
 cost: 44
 schedule:
