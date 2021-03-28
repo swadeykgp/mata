@@ -68,6 +68,6 @@ OS killing the process thinking it is not responding, where the partial output w
 
 Here the grid with obstacles and robots given in the assignment is done. 
 It will also have the cost matrix for job assignment, the result of optimal assignment.
-As an added feature a vizualization attempt is done.
+As an added feature a vizualization attempt is done, detailed in the Report.txt
 
 
