@@ -1,0 +1,500 @@
+MULTIAGENT PATH FINDING
+
+
+AIFA-ASSIGNMENT 1
+
+
+WORK DONE BY:
+1) Swarnava  Dey,  20AI92W01
+2) Seban James  , 20AI92R03  
+
+
+
+
+
+
+
+
+CENTRE OF EXCELLENCE IN 
+ARTIFICIAL  INTELLIGENCE
+
+
+IIT Kharagpur,INDIA
+
+
+PROBLEM STATEMENT:
+Consider a warehouse management system by a group of robots. A group of robots need to pick up items from designated places, deliver those in desired locations, and finally the robots go to their respective destination location. This can be seen as a multiagent system with shared tasks as objective. Assume that the entire planning needs to be done in a 2D grid representation of size n × m. Each location (Li) on the warehouse floor can be denoted by a pair of integers Li=(xi, yi). Each cell on the grid can be categorized in one of the following ways (see diagram below) - source location (P1, P2 ...), destination location (D1,D2,...), temporary storage location (TS1,TS2,....), obstacle (black square),normal (rest of the cells). Source & destination denote pick-up and drop locations respectively.
+
+Temporary storage location denotes the place where robots can keep some items. Obstacles represent a location where no robot can move. Rest of the cells are considered normal cells.
+
+Let there be k number of robots and r number of tasks. The details of robot location and tasks are provided as per the following table.
+Following tables show the Robot and task tables with 4 robots and 4 tasks. 
+							
+ROBOTS
+LOCATION
+
+Initial                  Final
+ROBOT1
+R1                       E1
+ROBOT2
+R2                       E2
+ROBOT3
+R3                       E2
+ROBOT4
+R4                      E3
+
+TASKS
+LOCATION
+
+Pickup         Deliver
+Task1
+P1                D1
+Task2
+P2                D3
+Task3
+P3                D3
+Task4
+P4                D2
+
+
+
+
+Assume that a robot can move at most one cell (either vertically or horizontally) at a time step, a normal cell can be occupied by at most one robot. Source, destination, temporary storage locations can accommodate multiple robots simultaneously. Our target here is to develop a work schedule that minimizes the time to complete all tasks. You need to develop both optimal as well as heuristic algorithms.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+SOLUTION APPROACH:
+
+Our challange is to select a a scalable alogirithm for optimal assignment of tasks to robots such that the overall make-span is minimized.
+
+To address this,  we first need the cost of assigning all the tasks to all abailable robots in form of a matrix.
+
+The added complexity in this problem is that the cost of assigning a task to a robot will include 1) robot picking up the task 2) dropping the task to its destination and finally 3) reaching the goal area of the robot. 
+So this complete path needs to be calculated for each (robot, task) pair, avoiding the obstacles in the grid.
+
+For this we devise the following algorithm:
+
+ For each robot i
+           For each task j
+                    Find cost for robot- i and  task j pair - start to pick
+                    now next part is fixed 
+                    add cost for  pick to drop
+                    add cost for drop to goal for this combo
+                    Put this in the cost matrix (i,j) location
+
+Such a cost matrix would look like the following, where the x-cordinate represents a robot and  y-cordinate represents a task :
+
+208     321     585     887     1118    1274    1494    1734    2009    2156
+2459    2655    3028    3225    3370    3615    3927    4109    4294    4482
+4753    4917    5258    5490    5644    5857    6137    6300    6520    6688
+6959    7111    7440    7677    7843    8044    8312    8487    8709    8879
+9112    9238    9541    9804    9996    10171   10413   10614   10850   10968
+11273   11471   11846   12073   12193   12440   12754   12906   13121   13311
+13615   13812   14186   14387   14528   14774   15087   15265   15454   15643
+15884   16008   16241   16590   16868   17037   17229   17516   17838   18032
+18305   18449   18735   19029   19252   19447   19658   19890   20157   20329
+20657   20878   21276   21495   21618   21888   22225   22399   22606   22819
+
+Once the cost matrix is prepared, we need to use that to find the optimal assignment of tasks to robots such that the overall make-span is minimized. This can be done in two ways:
+
+The first approach that we consider is the  enumeration exploration of the whole search space and then find the minimum assignment schedule. This is done using the Depth first Search with Branch and Bound. The algorithm travarses a search tree  by creating an open list with the Root nod as starting point and expands the search with unexplored neighbors. We have use the same algorithm that was taught in the class, but taken the minimum cost node from the open list , kept in form of a priority queue.
+1. [Initialize] Initially the OPEN List contains the Start Node s. CLOSED List is Empty.
+2.[Select] Select the first Node  (we have modified this to take the min node) n on the OPEN List. If OPEN is empty, Terminate
+3.[Goal Test] If n is Goal, then decide on Termination or Continuation / Cost Updation
+4.[Expand] 
+ a)Generate the successors n_1, n_2, .... n_k, of node n, based on the State Transformation Rules
+  b)Put n in LIST CLOSED
+ c)For each n_i, not already in OPEN or CLOSED List, put n_iin the FRONT of OPEN List
+d)For each n_ialready in OPEN or CLOSED decide based on cost of the paths5.[Continue] Go to Step 2
+
+This approach however takes huge amount of time and memory due to state space explosion. To handle this we follow another heuristic approach of the Kuhn-Munkres algorithm . This is an O(∣Vertex∣3) algorithm and works as follows:
+
+1. For each row of the robot-task matrix, we find the smallest element and subtract it from all the elements of that  row.
+2. For each column of the robot-task matrix, we find the smallest element and subtract it from all the elements of that  column.
+3. Cover all zeros in the matrix using minimum number of horizontal and vertical lines.
+4. Optimality Test: If we need minimum n lines to cover all the zeros in a nxn grid, we found an optimal assignment.  If not, we need  to try step 5.
+5. Find the smallest entry that is not covered by any line so far. We subtract this entry from each uncovered row, and then add it to each covered column. Go to step 3.
+
+
+We do these individual point to point local cost calculation by runnig an A* search between two points (say, start & pick). The A* algorithm as taught in our class is as follows:
+
+1.[Initialize] Initially the OPEN List contains the Start Node s. g(s) = 0, f(s) = h(s).  CLOSED List is Empty.
+2.[Select] Select the Node n on the OPEN List with minimum f(n). If OPEN is empty, Terminate with Failure
+3.[Goal Test, Terminate] If n is Goal, then Terminate with Success and path from s to n.
+4.[Expand] 
+  a)Generate the successors n_1, n_2, .... n_k, of node n, based on the State Transformation Rules
+  b)Put n in LIST CLOSED
+  c)For each n_i, not already in OPEN or CLOSED List, compute
+      a)g(n_i) = g(n) + c(n, n_i), f(n_i) = g(n_i) + h(n_i) , Put n_iin the OPEN List
+  d)For each n_ialready in OPEN, if g(n_i) > g(n) + c(n,n_i), then revise costs as:
+      a)g(n_i) = g(n) + c(n, n_i), f(n_i) = g(n_i) + h(n_i) 
+5.[Continue] Go to Step 2
+
+This A* search operates on the 2D grid that we design. This grid is specified by Rows & Columns and ‘1’ denotes that a cell is a normal cell, and ‘0’ denotes that it an obstacle.  An example generated grid looks like the following:
+111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111101111111111111111111111111111111111111111111111111111111111111111111111111111111111110111111111111111111111111111111111111111111111111101111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111101111111111111111111111111111111111111111111111111111111111101111111111111111111111110111111111111111111111111011111111111111111111111111111111111111111111111111110111111111111111111111111110111111111111111111101111111111111111111011111111101111111111111111111111111111111111011111111111111111111111111111111111111111111111111111111111111111111111111111110111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111110111111111111111111111111011111111111111111111111111111111111111111111111111111111111111111111111111111111111101111111111111111111111111111111111111101111111111111111111111111111111111111111111111011111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111101111111110111111111011110111111111111111111111111111111111111111111111111111111111111111111111111111111111111011111111101111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111101111111111111111111111111111111111111111111111110111111111111111111111111101111111111111111111111111111111111
+
+
+RESULTS:
+
+For a  ROW 100 x  COL 200 with 10 Tasks and  10 Robots the Heuristic search is 724299 time faster than the optimal algorithm – that is fascinating for me!
+
+Here is the run showing the GRID, cost matrix, optimal assignments and the time taken for the above run:
+ 
+Grid  ROW 100
+Grid COL 200
+Task  10
+Robot  10
+
+ starting scalability test **********************
+ Create and print the Grid
+11111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111
+11111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111110111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111
+11111111111111111111111111111111111111111111111111011111111111111111111111111111111111111111111111110111111111111111111111111111111111111111111111111101111111111111111111111110111111111111111111111111
+11111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111110111111111111111111111111111111111111111111111111111111111111111111111111110111111111111111111111111
+11111111111111111111111110111111111111111111111111011111111111111111111111101111111111111111111111111111111111111111111111111111011111111111111111111111111111111111111111111111111111111111111111111111
+111111111111111111110111111111111111111101111111111111111111011111111101111111111111111111111111111111111011111111111111111111111111111
+(  grid is  truncated)
+
+
+Print Cost matrix
+
+208	321	585	887	1118	1274	1494	1734	2009	2156	
+2459	2655	3028	3225	3370	3615	3927	4109	4294	4482	
+4753	4917	5258	5490	5644	5857	6137	6300	6520	6688	
+6959	7111	7440	7677	7843	8044	8312	8487	8709	8879	
+9112	9238	9541	9804	9996	10171	10413	10614	10850	10968	
+11273	11471	11846	12073	12193	12440	12754	12906	13121	13311	
+13615	13812	14186	14387	14528	14774	15087	15265	15454	15643	
+15884	16008	16241	16590	16868	17037	17229	17516	17838	18032	
+18305	18449	18735	19029	19252	19447	19658	19890	20157	20329	
+20657	20878	21276	21495	21618	21888	22225	22399	22606	22819	
+ Optimal Search BB Starting ..........
+
+Optimal Cost is :
+Assign Robot-0 to Task-6
+
+Assign Robot-1 to Task-3
+
+Assign Robot-2 to Task-8
+
+Assign Robot-3 to Task-7
+
+Assign Robot-4 to Task-9
+
+Assign Robot-5 to Task-4
+
+Assign Robot-6 to Task-5
+
+Assign Robot-7 to Task-2
+
+Assign Robot-8 to Task-1
+
+Assign Robot-9 to Task-0
+113008
+ Heuristic Search Starting ..........
+Using heuristic
+Cost is 113008
+Assign Robot-0 to  Task-6 
+Assign Robot-1 to  Task-3 
+Assign Robot-2 to  Task-8 
+Assign Robot-3 to  Task-7 
+Assign Robot-4 to  Task-9 
+Assign Robot-5 to  Task-4 
+Assign Robot-6 to  Task-5 
+Assign Robot-7 to  Task-2 
+Assign Robot-8 to  Task-1 
+Assign Robot-9 to  Task-0 
+
+
+Time taken by baranch and bound optimal search: 13037396
+
+
+Time taken by heuristic search: 18
+
+
+Sometimes the system resource limits (RAM, CPU) may not allow the full state space opening done in the BB optimal search. In that case I tried running only the heuristic algorithm and scale to higher # of robots/tasks and larger grid:
+
+The usual behavior is memory overflow , where there will be Segmentation fault (core dumped) and you can check through gdb
+or,
+OS killing the process thinking it is not responding, where the partial output will be available. This can be observed by running loadavg and top 
+
+Here is an example of such a run:
+Grid  ROW  200
+Grid COL 400
+Task  20
+Robot  20
+ starting scalability test **********************
+ Create and print the Grid
+1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111
+1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111011111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111101111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111110111111111111111111111111111111111111111111111111101111111111111111111111111111111111111111111111111
+(  grid is  truncated)
+
+Print Cost matrix
+
+402	885	1335	1997	2514	3075	3382	3839	4280	4830	5135	5908	6505	6960	7358	7604	7903	8172	8371	8606	
+9144	9456	9657	10324	10999	11433	11895	12285	13035	13276	13730	14248	14603	14861	15224	15779	16332	16638	1713717521	
+17874	18280	18653	19304	19810	20294	20713	21138	21706	22179	22479	23175	23695	24073	24394	24778	25146	25381	2575726103	
+26458	26876	27261	27914	28422	28918	29339	29766	30336	30821	31123	31831	32363	32753	33086	33472	33842	34079	3445734805	
+35170	35614	36025	36648	37128	37650	37918	38336	38816	39327	39595	40329	40887	41303	41662	41947	42230	42460	4268942885	
+43425	43739	44010	44679	45356	45724	46188	46546	47298	47603	48059	48521	48854	49114	49479	50036	50591	50899	5140051786	
+52130	52503	52843	53395	53871	54322	54610	54957	55508	55948	56203	56866	57353	57698	57986	58342	58696	58858	5915859373	
+59755	60104	60431	60961	61480	61888	62194	62498	63092	63489	63787	64407	64851	65153	65459	65858	66255	66447	6679067018	
+67455	67757	67999	68654	69228	69701	70124	70553	71202	71544	71897	72462	72856	73125	73436	73890	74342	74581	7497975329	
+75886	76217	76443	77129	77823	78232	78713	79088	79857	80117	80590	81083	81432	81709	82091	82665	83237	83562	8408084483	
+84846	85195	85511	86149	86649	87105	87511	87923	88498	88914	89201	89840	90303	90624	90918	91298	91676	91898	9226192594	
+93166	93512	93735	94436	95145	95573	96069	96459	97243	97484	97972	98484	98848	99140	99537	100126	100713	101053	101586102004	
+102481	102751	102953	103576	104190	104631	105032	105429	106118	106420	106813	107338	107700	107937	108239	108733	109225	109470	109908110231	
+110519	110953	111354	111967	112403	112915	113264	113672	114170	114671	114901	115625	116173	116579	116928	117242	117540	117760	118066118342	
+118728	119260	119759	120470	120987	121597	121953	122459	122923	123522	123842	124664	125310	125814	126261	126541	126824	127142	127414127698	
+128227	128530	128772	129430	130096	130489	130942	131291	132032	132308	132753	133230	133551	133800	134154	134700	135244	135541	136031136406	
+136954	137276	137497	138174	138859	139273	139745	140115	140875	141130	141594	142092	142432	142700	143073	143638	144201	144517	145026145420	
+145864	146165	146444	147017	147598	147954	148322	148634	149290	149625	149985	150543	150925	151177	151446	151907	152366	152578	152983153273	
+153621	153985	154316	154867	155352	155794	156113	156451	157011	157442	157706	158360	158838	159174	159453	159818	160181	160331	160640160886	
+161327	161598	161836	162456	163034	163472	163860	164254	164907	165245	165602	166163	166548	166791	167067	167525	167981	168190	168592168907	
+ Heuristic Search Starting ..........
+Using heuristic
+Cost is 1703481
+Assign Robot-0 to  Task-1 
+Assign Robot-1 to  Task-9 
+Assign Robot-2 to  Task-6 
+Assign Robot-3 to  Task-4 
+Assign Robot-4 to  Task-8 
+Assign Robot-5 to  Task-7 
+Assign Robot-6 to  Task-19 
+Assign Robot-7 to  Task-17 
+Assign Robot-8 to  Task-11 
+Assign Robot-9 to  Task-3 
+Assign Robot-10 to  Task-16 
+Assign Robot-11 to  Task-2 
+Assign Robot-12 to  Task-13 
+Assign Robot-13 to  Task-10 
+Assign Robot-14 to  Task-0 
+Assign Robot-15 to  Task-12 
+Assign Robot-16 to  Task-5 
+Assign Robot-17 to  Task-14 
+Assign Robot-18 to  Task-18 
+Assign Robot-19 to  Task-15 
+
+
+
+Time taken by heuristic search: 69
+
+
+ 
+After getting the optimal robot-task pairs, we can generate the complete trajectory for each robot. This part is not automated yet due to time constraints, we will fix this in the future versions. 
+
+There may be collisions in the trajectories and then we need to pass these paths to a Conflict Based Search algorithm to resolve the collisions. 
+
+A vanila A* has no concept of time. With time the moves from a state will become < up, down, left, right , wait > in grid. A state space of 5k
+Thus, for say 20 agents A* has to expand 9.5367×10¹³ nodes! 
+
+To address this CBS employs local search (A*) to find path for each agent. Then the algorithm finds out conflicts – i.e., same x,y at same time
+Then for a pair of nodes, CBS will try to constrain one of the robots/agents to wait and avoid the collision point.
+
+I have enhanced the basic CBS and A* algorithms to accomodate the pick up and drop location for each task assigned to each agent.
+
+You can experiment with the enhanced code here in the following manner:
+
+cd conflict_resolution/
+python cbs_enhanced++.py input_ass1_ply_with_this.yaml output_ass1_ply_with_this.yaml
+
+The input file can be specified as follows:
+
+agents:
+-   start: [0, 5]
+    pick: [0, 0]
+    drop: [12, 2]
+    goal: [8, 5]
+    name: Rob-1
+-   start: [9, 0]
+    pick: [6, 1]
+    drop: [5, 5]
+    goal: [5, 0]
+    name: Rob-2
+-   start: [1, 5]
+    pick: [0, 0]
+    drop: [5, 5]
+    goal: [6, 0]
+    name: Rob-3
+
+map:
+    dimensions: [17, 6]
+    obstacles:
+    - !!python/tuple [13, 0]
+    - !!python/tuple [1, 2]
+    - !!python/tuple [15, 2]
+    - !!python/tuple [10, 4]
+    - !!python/tuple [3, 5]
+
+We will get these assignments from the previous step ( file  generation will be automated in next release)
+
+The output will 
+
+It is the input file which we have to predefine the No.of Robots which are available to complete the all tasks.We have to predefine the Robot’s start and end locations and Task’s pickup and delivery locations.
+For any agent let’s say agent0, We have 4 tasks as following
+In this our format in INPUT1 file:
+goal: [7, 2]
+    	name: agent0
+    	start: [2, 5]
+It means agent0 starts from the start position and reaches to this goal position. Like this,we have the following four tasks as mentioned below.
+Task1: robot start position to pick-up location.
+Task2: pickup location to storage station.
+Task3: storage station to delivery location
+Task4:delivery location to final location of robot.
+
+In this file,we have other inputs which are obstacle cells where robots can not progress through that cell. 
+
+In our input file we just take two robots but we can take any number of robots we want. We can make our desired grid size and can make any number of obstacles.Care must be taken in assigning start location,end location,pickup location,end location as these can’t  be obstacle cells. This is our input file.
+
+In the output file, every agent starts from their starting position at time t=0 secs to do the Task1 as we mentioned in the input file. Output is in the format that at time t,x and y coordinates of a robot are printed as below. After completion of Task1 by all robots, Task2 will be initiated at time t=x where x is a time taken by the corresponding agent to complete its previous task i.e, Task1 here. Like this, by completion of all tasks by all robots, we will get time taken by a robot to complete all of its tasks.
+
+cost: 44
+schedule:
+  Rob-1:
+  - t: 0
+    x: 0
+    y: 5
+  - t: 1
+    x: 0
+    y: 4
+  - t: 2
+    x: 0
+    y: 3
+  - t: 3
+    x: 1
+    y: 3
+  - t: 4
+    x: 2
+    y: 3
+  - t: 5
+    x: 2
+    y: 2
+  - t: 6
+    x: 3
+    y: 2
+  - t: 7
+    x: 4
+    y: 2
+  - t: 8
+    x: 5
+    y: 2
+  - t: 9
+    x: 6
+    y: 2
+  - t: 10
+    x: 7
+    y: 2
+  - t: 11
+    x: 8
+    y: 2
+  - t: 12
+    x: 9
+    y: 2
+  - t: 13
+    x: 9
+    y: 2
+  - t: 14
+    x: 8
+    y: 2
+  - t: 15
+    x: 8
+    y: 3
+  - t: 16
+    x: 8
+    y: 4
+  - t: 17
+    x: 8
+    y: 5
+  Rob-2:
+  - t: 0
+    x: 9
+    y: 0
+  - t: 1
+    x: 9
+    y: 1
+  - t: 2
+    x: 8
+    y: 1
+  - t: 3
+    x: 7
+    y: 1
+  - t: 4
+    x: 6
+    y: 1
+  - t: 5
+    x: 5
+    y: 1
+  - t: 6
+    x: 5
+    y: 2
+  - t: 7
+    x: 5
+    y: 3
+  - t: 8
+    x: 5
+    y: 4
+  - t: 9
+    x: 5
+    y: 3
+  - t: 10
+    x: 5
+    y: 2
+  - t: 11
+    x: 5
+    y: 1
+  - t: 12
+    x: 5
+    y: 0
+(truncated)
+ACKNOWLEDGEMENTS:
+
+1. Branch and bound search taken from:
+Aditya Goel
+https://www.geeksforgeeks.org/job-assignment-problem-using-branch-and-bound/
+www.cs.umsl.edu/~sanjiv/classes/cs5130/lectures/bb.pdf
+
+
+2. Kuhn-Munkres Hungarian algorithm taken from:
+ http://ranger.uta.edu/~weems/NOTES5311/hungarian.c
+Yash Varyani. https://www.geeksforgeeks.org/hungarian-algorithm-assignment-problem-set-1-introduction/
+
+3. A* algorithm basic taken from:
+Rachit Belwariar.
+https://www.geeksforgeeks.org/a-search-algorithm/
+
+4. CBS basic algorithm and vizualization taken from:
+https://github.com/atb033/multi_agent_path_planning

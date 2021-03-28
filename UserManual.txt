@@ -1,0 +1,73 @@
+MULTIAGENT PATH FINDING
+
+
+AIFA-ASSIGNMENT 1: USER MANUAL
+
+
+WORK DONE BY:
+1) Swarnava  Dey,  20AI92W01
+2) Seban James  , 20AI92R03  
+
+
+
+
+
+
+
+
+CENTRE OF EXCELLENCE IN 
+ARTIFICIAL  INTELLIGENCE
+
+
+IIT Kharagpur,INDIA
+
+
+USER MANUAL
+
+1. Git clone the repo in your system (preferebly Linux)
+2. make clean
+3. make all
+
+Now you will have the following executable files in the directory:
+ass_scale, ass_scale_heu, ass_func_viz
+
+Scalability test:
+1. Try running ./ass_scale > log.txt
+
+log.txt will contain the auto-generated grid with many obstacles. 
+It will have the cost matrix for job assignment.
+It will also have the result of optimal assignment and the time taken to run both optimal and heuristic search.
+
+To configure the number of rows and colums of the grid and the number of tasks and robots change the following parameters in the ass_1_AIFA_scalability.cpp:
+#define ROW 200
+#define COL 400
+#define N 20
+You need to recompile the code by make all or only the appropriate target:
+
+run the ./ass_scale > log.txt again with new parameters
+
+(c++ allows compile time array declaration only, this will be fixed in next version using vector)
+
+2. Sometimes the system resource limits (RAM, CPU) may not allow the full state space opening done in the BB optimal search. In that case you may run only the heuristic algorithm and scale to higher # of robots/tasks and larger grid:
+
+./ass_scale_heu  > log.txt
+
+To configure the number of rows and colums of the grid and the number of tasks and robots change the following parameters in the ass_1_AIFA_scalability.cpp:
+#define ROW 200
+#define COL 400
+#define N 20
+You need to recompile the code by make all or only the appropriate target:
+
+run the ./ass_scale_heu > log.txt again with new parameters
+The usual behavior is memory overflow , where there will be Segmentation fault (core dumped) and you can check through gdb
+or,
+OS killing the process thinking it is not responding, where the partial output will be available. This can be observerd by running loadavg and top 
+ 
+3. Functionality test:
+1. Try running ./ass_func_viz 
+
+Here the grid with obstacles and robots given in the assignment is done. 
+It will also have the cost matrix for job assignment, the result of optimal assignment.
+As an added feature a vizualization attempt is done.
+
+
