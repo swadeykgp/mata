@@ -1,0 +1,18 @@
+ACKNOWLEDGEMENTS:
+
+1. Branch and bound search taken from:
+Aditya Goel
+https://www.geeksforgeeks.org/job-assignment-problem-using-branch-and-bound/
+www.cs.umsl.edu/~sanjiv/classes/cs5130/lectures/bb.pdf
+
+
+2. Kuhn-Munkres Hungarian algorithm taken from:
+ http://ranger.uta.edu/~weems/NOTES5311/hungarian.c
+Yash Varyani. https://www.geeksforgeeks.org/hungarian-algorithm-assignment-problem-set-1-introduction/
+
+3. A* algorithm basic taken from:
+Rachit Belwariar.
+https://www.geeksforgeeks.org/a-search-algorithm/
+
+4. CBS basic algorithm and vizualization taken from:
+https://github.com/atb033/multi_agent_path_planning
